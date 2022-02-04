@@ -39,7 +39,7 @@ write_files:
 
       function createRawEmail {
         # Create message
-        echo '{"Data": "From:'${var.sender_email}'\nTo:'${var.recipient_email}'\nSubject:'Daily Log Summary from Ghost'\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\n['Follows as an attachment the summary of Ghost logs for the day']\n\n--NextPart\nContent-Type:'${var.attachment_type}';\nContent-Disposition: attachment; filename=\"'logs.log'\"\n\n'$(cat ./${var.log_file_name})'\n--NextPart--"}' > message.json
+        echo '{"Data": "From:'${var.sender_email}'\nTo:'${var.recipient_email}'\nSubject:'Daily Log Summary from Ghost'\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\n['Follows as an attachment the summary of Ghost logs for the day']\n\n--NextPart\nContent-Type:'${var.attachment_type}';\nContent-Disposition: attachment; filename=\"'logs.log'\";\nContent-Transfer-Encoding: base64\n\n'$(cat /var/www/${var.cf_zone}/content/logs/${var.log_file_name} | base64 )'\n--NextPart--"}' > message.json
       }
 
       packageGhostBackupData
@@ -49,7 +49,7 @@ write_files:
       aws ses send-raw-email --region us-east-2 --raw-message file://message.json
       
       # Upload backup file
-      aws s3 cp blog_backup.tar.gz.gpg s3://${var.backup_bucket_name}/${var.backup_folder}/
+      aws s3 cp /home/${var.sys_username}/${var.backup_folder}/blog_backup.tar.gz s3://${var.backup_bucket_name}/${var.backup_folder}/
       
       # Cleanup files generated in the process
       rm blog_backup.tar.gz
