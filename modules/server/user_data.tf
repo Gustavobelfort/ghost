@@ -49,7 +49,7 @@ write_files:
       aws ses send-raw-email --region us-east-2 --raw-message file://message.json
       
       # Upload backup file
-      aws s3 cp /home/${var.sys_username}/${var.backup_folder}/blog_backup.tar.gz s3://${var.backup_bucket_name}/${var.backup_folder}/
+      aws s3 cp blog_backup.tar.gz s3://${var.backup_bucket_name}/${var.backup_folder}/
       
       # Cleanup files generated in the process
       rm blog_backup.tar.gz
